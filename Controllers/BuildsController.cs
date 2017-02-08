@@ -14,19 +14,13 @@ namespace ReleaseControlPanel.API.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpGet("upcoming-releases")]
-        public IEnumerable<Release> GetUpcomingReleases()
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet("successful-builds")]
+        [HttpGet("successful")]
         public IEnumerable<string> GetSuccessfulBuildsForProjects()
         {
             throw new NotImplementedException();
         }
 
-        [HttpPost("start-build")]
+        [HttpPost("start")]
         public void StartBuild(string projectName, string version)
         {
             throw new NotImplementedException();
