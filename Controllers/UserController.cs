@@ -1,10 +1,11 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using ReleaseControlPanel.API.Models;
 
 namespace ReleaseControlPanel.API.Controllers
 {
     [Route("[controller]")]
-    public class User : Controller
+    public class UserController : Controller
     {
         [HttpPut]
         public void CreateUser(User user)
