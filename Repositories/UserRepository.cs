@@ -23,9 +23,9 @@ namespace ReleaseControlPanel.API.Repositories
                 _database = _client.GetDatabase(settings.Value.Database);
         }
 
-        public async Task Delete(string id)
+        public async Task<DeleteResult> Delete(string id)
         {
-            await Users.DeleteOneAsync(Builders<User>.Filter.Eq("Id", id));
+            return await Users.DeleteOneAsync(Builders<User>.Filter.Eq("Id", id));
         }
 
         public async Task<User> Get(string id)
@@ -47,9 +47,27 @@ namespace ReleaseControlPanel.API.Repositories
             await Users.InsertOneAsync(user);
         }
 
-        public async Task Update(User user)
+        public async Task<UpdateResult> Update(User user)
         {
-            await Users.ReplaceOneAsync(u => u.Id.Equals(user.Id), user, new UpdateOptions { IsUpsert = false });
+            var filter = Builders<User>.Filter.Eq("Id", user.Id);
+            var update = Builders<User>.Update
+                .Set(u => u.CiBuildApiToken, user.CiBuildApiToken)
+                .Set(u => u.CiBuildUserName, user.CiBuildUserName)
+                .Set(u => u.CiQaApiToken, user.CiQaApiToken)
+                .Set(u => u.CiQaUserName, user.CiQaUserName)
+                .Set(u => u.CiStagingApiToken, user.CiStagingApiToken)
+                .Set(u => u.CiStagingUserName, user.CiStagingUserName)
+                .Set(u => u.FullName, user.FullName)
+                .Set(u => u.IsEncrypted, user.IsEncrypted)
+                .Set(u => u.JiraPassword, user.JiraPassword)
+                .Set(u => u.JiraUserName, user.JiraUserName)
+                .Set(u => u.Password, user.Password)
+                .Set(u => u.PasswordSalt, user.PasswordSalt)
+                .Set(u => u.UserName, user.UserName)
+                .Set(u => u.UserSecret, user.UserSecret)
+                .CurrentDate(u => u.UpdatedOn);
+
+            return await Users.UpdateOneAsync(filter, update);
         }
     }
 }

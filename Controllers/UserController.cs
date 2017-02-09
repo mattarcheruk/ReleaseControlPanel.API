@@ -31,7 +31,7 @@ namespace ReleaseControlPanel.API.Controllers
             var existingUser = await _userRepository.FindByUserName(user.UserName);
             if (existingUser != null)
             {
-                _logger.LogTrace($"Cannot create a new user: user with UserName = '{user.UserName}' already exists.");
+                _logger.LogTrace($"Cannot create a new user: User with UserName = '{user.UserName}' already exists.");
                 return StatusCode(409, "User with this UserName already exists.");
             }
 
@@ -41,9 +41,30 @@ namespace ReleaseControlPanel.API.Controllers
         }
 
         [HttpDelete("{userName}")]
-        public void DeleteUser(string userName)
+        public async Task<IActionResult> DeleteUser(string userName)
         {
-            throw new NotImplementedException();
+            if (userName == null)
+            {
+                _logger.LogWarning("Tried to delete user with UserName = 'null'.");
+                return BadRequest("UserName cannot be null.");
+            }
+
+            var existingUser = await _userRepository.FindByUserName(userName);
+            if (existingUser == null)
+            {
+                _logger.LogTrace($"Cannot delete user: User with UserName = '{userName}' does not exist.");
+                return NotFound("User with this user name does not exist.");
+            }
+
+            var deleteResult = await _userRepository.Delete(existingUser.Id);
+            if (deleteResult.DeletedCount != 1)
+            {
+                _logger.LogError($"Could not delete user with UserName = '{userName}'. MongoDB client returned DeleteCound = {deleteResult.DeletedCount}.");
+                return StatusCode(500,
+                    $"Could not delete the user with UserName = '{userName}'. Check server logs for more information.");
+            }
+
+            return NoContent();
         }
 
         [HttpGet]
@@ -57,14 +78,14 @@ namespace ReleaseControlPanel.API.Controllers
         {
             if (userName == null)
             {
-                _logger.LogWarning("Tried to get a 'null' user.");
+                _logger.LogWarning("Tried to get user with UserName = 'null'.");
                 return BadRequest("UserName cannot be null.");
             }
 
             var user = await _userRepository.FindByUserName(userName);
             if (user == null)
             {
-                _logger.LogWarning($"Cannot find user with UserName = '{userName}'.");
+                _logger.LogTrace($"Cannot find user with UserName = '{userName}'.");
                 return NotFound("Cannot find user with this UserName.");
             }
 
