@@ -1,37 +1,31 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ReleaseControlPanel.API.Models
 {
     public class User
     {
-        public ObjectId Id { get; set; }
+        [BsonId]
+        public string Id { get; set; }
 
-        [BsonElement]
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+
+
         public string CiBuildApiToken { get; set; }
-        [BsonElement]
         public string CiBuildUserName { get; set; }
-        [BsonElement]
         public string CiQaApiToken { get; set; }
-        [BsonElement]
         public string CiQaUserName { get; set; }
-        [BsonElement]
         public string CiStagingApiToken { get; set; }
-        [BsonElement]
         public string CiStagingUserName { get; set; }
-        [BsonElement]
         public string FullName { get; set; }
-        [BsonElement]
+        public bool IsEncrypted { get; set; } = false;
         public string JiraPassword { get; set; }
-        [BsonElement]
         public string JiraUserName { get; set; }
-        [BsonElement]
         public string Password { get; set; }
-        [BsonElement]
         public string PasswordSalt { get; set; }
-        [BsonElement]
         public string UserName { get; set; }
-        [BsonElement]
         public string UserSecret { get; set; }
     }
 }

@@ -2,46 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ReleaseControlPanel.API.Models;
-using ReleaseControlPanel.API.Services;
 
 namespace ReleaseControlPanel.API.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private MongoClient _client;
-        private IMongoDatabase _database;
+        private IMongoCollection<User> Users => _database.GetCollection<User>("users");
 
-        public UserRepository(IConfigService configService)
+        private readonly MongoClient _client;
+        private readonly IMongoDatabase _database;
+
+        public UserRepository(IOptions<Settings> settings)
         {
-            _client = new MongoClient(configService.MongoDbAddress);
-            _database = _client.GetDatabase(configService.MongoDbDatabaseName);
+            _client = new MongoClient(settings.Value.ConnectionString);
+
+            if (_client != null)
+                _database = _client.GetDatabase(settings.Value.Database);
         }
 
-        public Task Delete(string id)
+        public async Task Delete(string id)
         {
-            throw new NotImplementedException();
+            await Users.DeleteOneAsync(Builders<User>.Filter.Eq("Id", id));
         }
 
-        public Task<User> FindById(string id)
+        public async Task<User> Get(string id)
         {
-            throw new NotImplementedException();
+            return await Users
+                .Find(Builders<User>.Filter.Eq("Id", id))
+                .FirstOrDefaultAsync();
         }
 
-        public Task<User> FindByUserName(string userName)
+        public async Task<User> FindByUserName(string userName)
         {
-            throw new NotImplementedException();
+            return await Users
+                .Find(Builders<User>.Filter.Eq("UserName", userName))
+                .FirstOrDefaultAsync();
         }
 
-        public Task Insert(User user)
+        public async Task Insert(User user)
         {
-            throw new NotImplementedException();
+            await Users.InsertOneAsync(user);
         }
 
-        public Task Update(User user)
+        public async Task Update(User user)
         {
-            throw new NotImplementedException();
+            await Users.ReplaceOneAsync(u => u.Id.Equals(user.Id), user, new UpdateOptions { IsUpsert = false });
         }
     }
 }
