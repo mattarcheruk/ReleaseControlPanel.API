@@ -1,12 +1,20 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using ReleaseControlPanel.API.Models;
+using ReleaseControlPanel.API.Repositories;
 
 namespace ReleaseControlPanel.API.Controllers
 {
     [Route("[controller]")]
     public class UserController : Controller
     {
+        private IUserRepository _userRepository;
+
+        public UserController(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
+
         [HttpPut]
         public void CreateUser(User user)
         {
@@ -22,6 +30,7 @@ namespace ReleaseControlPanel.API.Controllers
         [HttpGet]
         public User GetCurrentUser()
         {
+            return new User();
             throw new NotImplementedException();
         }
 

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ReleaseControlPanel.API.Repositories;
+using ReleaseControlPanel.API.Services;
 
 namespace ReleaseControlPanel.API
 {
@@ -38,6 +40,9 @@ namespace ReleaseControlPanel.API
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddMvc();
+
+            services.AddSingleton<IConfigService, ConfigService>();
+            services.AddSingleton<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
