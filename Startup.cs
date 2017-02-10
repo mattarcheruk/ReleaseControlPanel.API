@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReleaseControlPanel.API.Models;
 using ReleaseControlPanel.API.Repositories;
+using ReleaseControlPanel.API.Services;
 
 namespace ReleaseControlPanel.API
 {
@@ -19,7 +20,7 @@ namespace ReleaseControlPanel.API
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IOptions<Settings> settings)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IOptions<AuthSettings> settings)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -48,14 +49,12 @@ namespace ReleaseControlPanel.API
 
             services.AddMvc();
 
-            services.Configure<Settings>(options =>
-            {
-                options.ConnectionString = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-                options.Database = Configuration.GetSection("MongoConnection:Database").Value;
-                options.AuthenticationScheme = Configuration.GetSection("Auth:Scheme").Value;
-            });
+            services.Configure<AppSettings>(Configuration.GetSection("App"));
+            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
+            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDb"));
 
             services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IGitService, GitService>();
         }
 
         public Startup(IHostingEnvironment env)

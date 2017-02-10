@@ -15,9 +15,9 @@ namespace ReleaseControlPanel.API.Controllers
     {
         private ILogger _logger;
         private IUserRepository _userRepository;
-        private Settings _settings;
+        private AuthSettings _settings;
 
-        public AuthController(ILogger<AuthController> logger, IUserRepository userRepository, IOptions<Settings> settings)
+        public AuthController(ILogger<AuthController> logger, IUserRepository userRepository, IOptions<AuthSettings> settings)
         {
             _logger = logger;
             _userRepository = userRepository;

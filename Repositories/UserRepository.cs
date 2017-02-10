@@ -15,7 +15,7 @@ namespace ReleaseControlPanel.API.Repositories
         private readonly MongoClient _client;
         private readonly IMongoDatabase _database;
 
-        public UserRepository(IOptions<Settings> settings)
+        public UserRepository(IOptions<MongoDbSettings> settings)
         {
             _client = new MongoClient(settings.Value.ConnectionString);
 
