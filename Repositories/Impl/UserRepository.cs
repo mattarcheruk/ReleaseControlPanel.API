@@ -6,9 +6,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ReleaseControlPanel.API.Models;
 
-namespace ReleaseControlPanel.API.Repositories
+namespace ReleaseControlPanel.API.Repositories.Impl
 {
-    public class UserRepository : IUserRepository
+    class UserRepository : IUserRepository
     {
         private IMongoCollection<User> Users => _database.GetCollection<User>("users");
 

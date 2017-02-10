@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReleaseControlPanel.API.Models;
 
-namespace ReleaseControlPanel.API.Services
+namespace ReleaseControlPanel.API.Services.Impl
 {
-    public class GitService : IGitService
+    class GitService : IGitService
     {
         private string GitRoot
         {

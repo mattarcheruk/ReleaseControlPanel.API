@@ -11,7 +11,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReleaseControlPanel.API.Models;
 using ReleaseControlPanel.API.Repositories;
+using ReleaseControlPanel.API.Repositories.Impl;
 using ReleaseControlPanel.API.Services;
+using ReleaseControlPanel.API.Services.Impl;
 
 namespace ReleaseControlPanel.API
 {
@@ -55,6 +57,7 @@ namespace ReleaseControlPanel.API
 
             services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IGitService, GitService>();
+            services.AddSingleton<ICiBuildService, CiBuildService>();
         }
 
         public Startup(IHostingEnvironment env)
