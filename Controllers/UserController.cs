@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ReleaseControlPanel.API.Models;
@@ -7,6 +8,7 @@ using ReleaseControlPanel.API.Repositories;
 
 namespace ReleaseControlPanel.API.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     public class UserController : Controller
     {
@@ -68,13 +70,20 @@ namespace ReleaseControlPanel.API.Controllers
         }
 
         [HttpGet]
-        public User GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.FindByUserName(User.Identity.Name);
+            if (user == null)
+            {
+                _logger.LogCritical("Failing to get logged in user is not correctly supported yet!");
+                throw new NotImplementedException();
+            }
+
+            return Json(user);
         }
 
         [HttpGet("{userName}")]
-        public async Task<ActionResult> GetUser(string userName)
+        public async Task<IActionResult> GetUser(string userName)
         {
             if (userName == null)
             {

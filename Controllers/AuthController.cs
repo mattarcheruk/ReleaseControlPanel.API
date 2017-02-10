@@ -1,22 +1,68 @@
 ﻿using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ReleaseControlPanel.API.Models;
+using ReleaseControlPanel.API.Repositories;
 
 namespace ReleaseControlPanel.API.Controllers
 {
     [Route("[controller]")]
     public class AuthController : Controller
     {
-        [HttpPost("login")]
-        public User Login(string userName, string password)
+        private ILogger _logger;
+        private IUserRepository _userRepository;
+        private Settings _settings;
+
+        public AuthController(ILogger<AuthController> logger, IUserRepository userRepository, IOptions<Settings> settings)
         {
-            throw new NotImplementedException();
+            _logger = logger;
+            _userRepository = userRepository;
+            _settings = settings.Value;
         }
 
-        [HttpPost("logout")]
-        public void Logout()
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginData loginData)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(loginData?.UserName))
+            {
+                _logger.LogWarning("Cannot login user with empty or null UserName.");
+                return BadRequest("UserName must not be empty.");
+            }
+
+            if (string.IsNullOrEmpty(loginData.Password))
+            {
+                _logger.LogWarning("Cannot login user with empty or null Password.");
+                return BadRequest("Password must not be empty.");
+            }
+
+            var user = await _userRepository.FindByUserName(loginData.UserName);
+            if (user == null || user.Password != loginData.Password)
+            {
+                _logger.LogTrace($"Invalid user name or password for user '{loginData.UserName}'.");
+                return Unauthorized();
+            }
+
+            var claims = new []
+            {
+                new Claim(ClaimTypes.Name, user.UserName)
+            };
+            var identity = new ClaimsIdentity(claims, "Basic");
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.Authentication.SignInAsync(_settings.AuthenticationScheme, principal);
+            return Json(user);
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.Authentication.SignOutAsync(_settings.AuthenticationScheme);
+            return StatusCode(204);
         }
     }
 }
